@@ -1,0 +1,84 @@
+//This is the third time experiment
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/ipc.h>
+
+int j=0;
+int i;
+
+struct pcb
+{
+    int id;     //the id of progress
+    int priority;
+    int cpu_time;
+    int all_time;   
+    int state;   //the now state of progress
+};
+
+struct pcb  p[4]={
+               {0,6,2,4,0},
+               {1,4,1,3,0},
+               {2,7,2,6,0},
+               {3,2,1,2,0}
+             };
+
+void max_prt()
+{   int max=p[0].priority;
+    for(i=1;i<4;i++)
+ {
+        if(max<p[i].priority)
+        {
+            max= p[i].priority;
+            j=i;
+        }
+    }
+}
+void show()
+{
+    printf("ID: %d\n",p[j].id);
+    printf("priority: %d\n",p[j].priority);
+    printf("cpu_time: %d\n all_time: %d\n",p[j].cpu_time,p[j].all_time);
+    printf("state: %d \n",p[j].state);
+}
+
+
+void run()
+{
+    printf("before runing, the state of pcb:\n\n");
+
+    max_prt();
+    show();
+    sleep(p[j].cpu_time);
+    p[j].state=1;
+    p[j].priority-=3;
+    p[j].all_time-=p[j].cpu_time;
+    for(i=0;i<4;i++)
+    {
+        if(i!=j)
+            p[i].priority++;
+    }
+
+    printf("After runing:\n\n");
+    show();
+}
+
+int end()
+{
+    for(i=0;i<4;i++)
+    {
+        if(p[i].all_time!=0)
+            return 1;
+    }
+    return 0;
+}
+
+
+
+int main()
+{
+    while(end())
+    {
+        run();
+    }
+    return 0;
